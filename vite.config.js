@@ -10,7 +10,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/url': {
-        target: 'http://localhost:8000',
+        target: 'https://0e82c1fb-ecf2-4ac8-82dc-7946dcb29424-00-32f1u9qhvz94.pike.replit.dev',
         changeOrigin: true,
       },
     },
