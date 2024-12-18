@@ -35,7 +35,7 @@ const Login = () => {
     setIsLoading(false);
   };
   return (
-    <div className="flex min-h-full    items-center flex-col justify-center px-6 py-12 lg:px-8">
+    <div className="flex  items-center flex-col justify-center m-2 px-6 py-12 lg:px-8">
       <div className="p-8 border flex flex-col shadow-md min-w-[400px] ">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <img

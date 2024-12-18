@@ -1,18 +1,13 @@
 // import React from 'react'
 import { Outlet, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import Cookies from "js-cookie";
 import axios from "axios";
 import { adminMenuGroups, menuGroups } from "../assets/constant";
 import Header from "../components/Header";
 const DashboardLayout = () => {
   const navigate = useNavigate();
-  const allCookies = Cookies.get();
   const [user, setUser] = useState({});
-  const getCookie = (name) => {
-    const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
-    return match ? match[2] : null;
-  };
+
   const signOut = async () => {
     try {
       await axios
@@ -27,41 +22,35 @@ const DashboardLayout = () => {
       console.log(error);
     }
   };
-  const setUserUsingtokens = async () => {
+  const refreshResponse = async () => {
     try {
-      const accessToken = allCookies.accessToken;
-      const refreshToken = allCookies.refreshToken;
-      console.log(getCookie("accessToken"));
-      console.log(accessToken, refreshToken);
-      if (accessToken == undefined && refreshToken != undefined) {
-        const refreshResponse = await axios.post(
-          `${import.meta.env.VITE_URL}/users/refresh-token`,
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${refreshToken}`,
-            },
-            withCredentials: true,
-          }
-        );
-        setUser(refreshResponse.data.data.user);
-        console.log(refreshResponse.data.data.user, "refreshed");
-      } else if (accessToken != undefined && refreshToken != undefined) {
-        const response = await axios.get(
-          `${import.meta.env.VITE_URL}/users/current-user`,
-          {
-            withCredentials: true,
-          }
-        );
-        console.log(response.data.data, "not refreshed");
-        setUser(response.data.data);
-      } else {
-        navigate("/auth/login");
-      }
-      console.log(user);
+      const refreshResponse = await axios.post(
+        `${import.meta.env.VITE_URL}/users/refresh-token`,
+        {},
+        {
+          withCredentials: true,
+        }
+      );
+      setUser(refreshResponse.data.data.user);
+      console.log(refreshResponse.data.data.user, "refreshed");
     } catch (error) {
-      signOut();
       console.log(error);
+      navigate("/auth/login")
+    }
+  };
+  const setUserData = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_URL}/users/current-user`,
+        {
+          withCredentials: true,
+        }
+      );
+      console.log(response.data.data, "not refreshed");
+      setUser(response.data.data);
+    } catch (error) {
+      console.log(error.message);
+      refreshResponse();
     }
   };
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -70,7 +59,7 @@ const DashboardLayout = () => {
     setIsMenuOpen(!isMenuOpen);
   };
   useEffect(() => {
-    setUserUsingtokens();
+    setUserData();
   }, []);
 
   return (

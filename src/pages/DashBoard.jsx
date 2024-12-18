@@ -2,10 +2,12 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import Book from "../components/Book";
+import Modal from "../components/Modal";
 
 const DashBoard = () => {
   const { user } = useOutletContext();
   const [wishlist,setWishlist]=useState([]);
+  const [show, setShow] = useState(false);
   useEffect(()=>{
     const getWishList=async()=>{
       try {
@@ -23,7 +25,10 @@ const DashBoard = () => {
 
   },[])
   return (
-    <div className="px-4 ">
+    <>
+    {show && <Modal setShow={setShow}/>}
+      <div className="px-4 ">
+      
       <div className="px-7 my-10 rounded-xl border bg-white  shadow-sm   ">
         <div className="mb-2 flex flex-col   py-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center">
@@ -57,14 +62,16 @@ const DashBoard = () => {
               <p className="text-slate-800 text-xl font-extrabold">
                 {user.fullName}
               </p>
-              <p className="text-slate-500">@{user.username}</p>
+              <p className="text-slate-500 text-sm">@{user.username}</p>
+              <p className="text-slate-500">Email : {user.email}</p>
+              <button className="text-blue-400" onClick={()=>setShow(true)}>Change Password</button>
             </div>
           </div>
         </div>
       </div>
       <div className="text-gray-700 text-xl font-bold">MY WISHLIST</div>
       <div className="grid grid-cols-1 py-4 md:grid-cols-2 lg:grid-cols-6 gap-2">
-
+        {wishlist.length==0?"No Books Wishlisted":""}
         {
          wishlist.map((book)=>{
             return <Book key={book._id} book={book}/>
@@ -72,6 +79,7 @@ const DashBoard = () => {
         }
       </div>
     </div>
+    </>
   );
 };
 

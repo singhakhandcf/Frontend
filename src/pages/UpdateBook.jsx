@@ -1,9 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,  useParams } from "react-router-dom";
 
-function CreateBook() {
+function UpdateBook() {
+  
+  let { id } = useParams();
+  const [displayImage,setDisplayImage]=useState("");
+  const [loading, setLoading] = useState(false);
   const navigate=useNavigate();
   const [formData, setFormData] = useState({
     title: "",
@@ -11,7 +15,6 @@ function CreateBook() {
     description: "",
     genre: "",
   });
-  const [loading,setLoading]=useState(false);
   const [coverImage, setCoverImage] = useState(null);
 
   const handleChange = (e) => {
@@ -34,33 +37,64 @@ function CreateBook() {
     }
 
     try {
-      const response=await axios.post(`${import.meta.env.VITE_URL}/books`, formDataToSend, {
+      const response=await axios.patch(`${import.meta.env.VITE_URL}/books/update/${id}`, formDataToSend, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
         withCredentials: true,
       });
-      toast.success("Book created successfully!");
+      toast.success("Book updated successfully!");
       setFormData({
         title: "",
         author: "",
         description: "",
         genre: "",
       });
-      setLoading(false);
       console.log(response.data.data);
       setCoverImage(null);
+      setLoading(false);
       navigate(`../books/${response.data.data._id}`)
     } catch (error) {
-      console.log(error);
-      toast.error("Failed to create book. Try again.");
       setLoading(false);
+      console.log(error);
+      toast.error("Failed to update book. Try again.");
     }
   };
 
+  useEffect(() => {
+    const getBook = async () => {
+      
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_URL}/books/${id}`,
+          {
+            withCredentials: true,
+          }
+        );
+        setFormData({
+          title: response.data.data.title,
+          author: response.data.data.author,
+          description: response.data.data.description,
+          genre: response.data.data.genre,
+        })
+        console.log(response.data.data);
+        setDisplayImage(response.data.data.coverImage)
+        
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getBook();
+  }, []);
+
   return (
-    <div className="max-w-xl mx-auto p-8">
-      <h1 className="text-2xl font-bold mb-4">Create New Book</h1>
+    <div className="p-8 grid grid-cols-1  lg:grid-cols-3">
+      <div className="flex flex-col gap-2 justify-center items-center">
+        <img className="w-[200px]" src={displayImage} alt="" />
+        <span className="text-gray-600 italic text-xs">*To change this cover image upload a new cover Image </span>
+      </div>
+      <div className="max-w-xl mx-auto lg:col-span-2">
+      <h1 className="text-2xl text-gray-700 font-bold mb-4">Update Book</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="text"
@@ -108,11 +142,12 @@ function CreateBook() {
           type="submit"
           className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
         >
-          Submit
+          {loading?"Updating...":"Submit"}
         </button>
       </form>
+    </div>
     </div>
   );
 }
 
-export default CreateBook;
+export default UpdateBook;

@@ -1,7 +1,9 @@
 import { useState } from "react";
 import PropTypes from 'prop-types';
+import { useNavigate } from "react-router-dom";
 
 const Header = ({ username, signOut,     setIsMenuOpen, isMenuOpen }) => {
+  const navigate=useNavigate();
     Header.propTypes = {
         username: PropTypes.string.isRequired,
         signOut: PropTypes.func.isRequired,
@@ -75,7 +77,7 @@ const Header = ({ username, signOut,     setIsMenuOpen, isMenuOpen }) => {
               </svg>
             </button>
           </div>
-          <div
+          <div onClick={()=>{setOpenDropdown(!openDropdown)}}
             className={` ${
               !openDropdown && "hidden"
             } absolute  right-0 z-10 mt-2 w-56 origin-top-right  rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none`}
@@ -85,15 +87,16 @@ const Header = ({ username, signOut,     setIsMenuOpen, isMenuOpen }) => {
             tabIndex="-1"
           >
             <div className="py-1" role="none">
-              <a
+              <button
+                onClick={()=>{navigate("/dashboard/account")}}
                 href="#"
-                className="block hover:bg-gray-100 px-4 py-2 text-sm text-gray-700"
+                className="block w-[100%]  text-start hover:bg-gray-100 px-4 py-2 text-sm text-gray-700"
                 role="menuitem"
                 tabIndex="-1"
                 id="menu-item-0"
               >
                 Account settings
-              </a>
+              </button>
 
               <form
                 onSubmit={(e) => {

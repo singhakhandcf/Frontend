@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 const Book = ({book}) => {
   const navigate=useNavigate();
   return (
-    <div onClick={()=>{navigate(`/dashboard/books/${book._id}`)}} className="cursor-pointer max-w-[200px] bg-white border border-gray-200 rounded-lg shadow">
+    <div onClick={()=>{navigate(`/dashboard/books/${book._id}`)}} className="cursor-pointer lg:max-w-[200px]  bg-white border border-gray-200 rounded-lg shadow">
       <div>
         <img
           className="rounded-t-lg w-[100%] bg-cover"

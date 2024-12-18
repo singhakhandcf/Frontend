@@ -1,15 +1,18 @@
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useOutletContext } from "react-router-dom";
+import Loader from "../components/Loader";
 const SingleBookPage = () => {
   const { user , setUser} = useOutletContext();
+  const [bookLoading,setBookLoading]=useState(false);
+  const [loading,setLoading]=useState(false);
   const contentRef = useRef(null);
   console.log(user);
   let { id } = useParams();
   const [book, setBook] = useState({});
-
+  const navigate=useNavigate();
   const handleAddComment = async (e) => {
     e.preventDefault();
     try {
@@ -44,10 +47,25 @@ const SingleBookPage = () => {
         toast.error(error.message);
       }
   }
-  const [loading, setLoading] = useState(false);
+
+  const handleDelete=async()=>{
+    await axios.delete(
+      `${import.meta.env.VITE_URL}/books/delete/${id}`,
+      {
+        withCredentials: true,
+      }
+    ).then(()=>{
+      toast.success("Book Deleted Successfully")
+      navigate("../books")
+    });
+  }
+  const handleUpdate=async()=>{
+    
+   navigate(`../books/update/${id}`)
+  }
   useEffect(() => {
     const getBook = async () => {
-      setLoading(true);
+      setBookLoading(true);
       try {
         const response = await axios.get(
           `${import.meta.env.VITE_URL}/books/${id}`,
@@ -57,8 +75,10 @@ const SingleBookPage = () => {
         );
         setBook(response.data.data);
         console.log(response.data.data);
-        setLoading(false);
+        setBookLoading(false);
       } catch (error) {
+        toast.error("Something went wrong")
+        setBookLoading(false);
         console.log(error);
       }
     };
@@ -66,11 +86,23 @@ const SingleBookPage = () => {
   }, []);
 
   return (
-    <div className="bg-gray-100  py-8">
+    <>
+    {bookLoading?<Loader/>:""}
+    <div className={`bg-gray-100  py-8 ${bookLoading?"hidden":""}`}>
+      
+      {
+        user.isAdmin?<div className="px-8 text-sm pb-4 flex items-center gap-4 justify-end">
+        <span className="text-gray-500">ADMIN CONTROLS : </span>
+        <button onClick={handleUpdate} className="border-2 p-1 rounded-sm text-emerald-400 border-emerald-400">UPDATE</button>
+        <button onClick={handleDelete} className="border-2 p-1 px-2 rounded-sm text-red-500 border-red-500">DELETE</button>
+       
+      </div>:""
+      }
+
       <div className="  mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex bg-white flex-col md:flex-row ">
           <div className=" ">
-            <div className="flex justify-center items-center  ">
+            <div className="flex justify-center items-center lg:max-w-[250px] ">
               <img className=" object-cover" src={book?.coverImage} />
             </div>
           </div>
@@ -127,7 +159,7 @@ const SingleBookPage = () => {
             </div>
             <button
               type="submit"
-              className="  w-[10%]  px-4 flex justify-center font-medium text-pretty text-center   items-center text-white bg-blue-700 rounded-lg hover:bg-primary-800"
+              className="  lg:w-[10%]  px-4 flex justify-center font-medium text-pretty text-center   items-center text-white bg-blue-700 rounded-lg hover:bg-primary-800"
             >
               Post
             </button>
@@ -141,7 +173,7 @@ const SingleBookPage = () => {
                 <footer className="flex justify-between items-center mb-2">
                   <div className="flex items-center">
                     <p className="inline-flex items-center mr-3  text-gray-900 ">
-                      {comment.user.username}
+                     @{comment.user.username}
                     </p>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
                       {new Date(comment.createdAt).toLocaleString("en-GB", {
@@ -161,6 +193,7 @@ const SingleBookPage = () => {
         </div>
       </section>
     </div>
+    </>
   );
 };
 
