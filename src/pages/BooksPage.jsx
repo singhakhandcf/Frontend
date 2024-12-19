@@ -35,7 +35,9 @@ const BooksPage = () => {
         return [...genres, selectedGenre].join(" ");
       }
     });
+    setPage(1);
   };
+
 
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
@@ -72,7 +74,7 @@ const BooksPage = () => {
           type="text"
           placeholder="Search books..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => {setSearch(e.target.value);setPage(1);}}
           className="border p-2 rounded-md w-full"
         />
       </div>

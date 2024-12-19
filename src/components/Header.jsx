@@ -39,7 +39,7 @@ const Header = ({ username, signOut,     setIsMenuOpen, isMenuOpen }) => {
         )}
       </button>
       <div className="px-4">
-        <div className="relative inline-block text-left">
+        <div className=" text-left">
           <div>
             <button
               onClick={() => {

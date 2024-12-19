@@ -53,8 +53,14 @@ function CreateBook() {
       navigate(`../books/${response.data.data._id}`)
     } catch (error) {
       console.log(error);
-      toast.error("Failed to create book. Try again.");
-      setLoading(false);
+      if(error.status===409){
+        toast.error("Duplicate Book not allowed");
+      }
+      else{
+        toast.error("Failed to create book. Try again.");
+      }
+      
+      //setLoading(false);
     }
   };
 
